@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameHub | Premium 3D Collection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @import "tailwindcss";
+
+        :root {
+            --color-charcoal: #0a0a0a;
+            --color-neon-purple: #a855f7;
+            --color-neon-cyan: #06b6d4;
+            --color-neon-pink: #ec4899;
+            --color-neon-green: #22c55e;
+            --color-neon-amber: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-charcoal);
+            color: white;
+            margin: 0;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.1) 0%, transparent 60%);
+            background-attachment: fixed;
+        }
+
+        .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Skeuomorphic Utilities */
+        .skeuo-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .skeuo-button {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.3),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .skeuo-button:active {
+            transform: translateY(2px);
+            box-shadow: 
+                0 2px 5px rgba(0, 0, 0, 0.3),
+                inset 0 1px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Neon Glows */
+        .neon-purple-glow { box-shadow: 0 0 30px rgba(168, 85, 247, 0.4); text-shadow: 0 0 15px rgba(168, 85, 247, 0.6); }
+        .neon-cyan-glow { box-shadow: 0 0 30px rgba(6, 182, 212, 0.4); text-shadow: 0 0 15px rgba(6, 182, 212, 0.6); }
+        .neon-pink-glow { box-shadow: 0 0 30px rgba(236, 72, 153, 0.4); text-shadow: 0 0 15px rgba(236, 72, 153, 0.6); }
+        .neon-green-glow { box-shadow: 0 0 30px rgba(34, 197, 94, 0.4); text-shadow: 0 0 15px rgba(34, 197, 94, 0.6); }
+        .neon-amber-glow { box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); text-shadow: 0 0 15px rgba(245, 158, 11, 0.6); }
+
+        .puffy-3d {
+            transform: translateZ(20px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .perspective-2000 {
+            perspective: 2000px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- Dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide-react@0.284.0/dist/umd/lucide-react.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useRef, useMemo } = React;
+        const { motion, AnimatePresence } = FramerMotion;
+        const { 
+            RotateCcw, Undo2, User, Cpu, Home, Play, Pause, 
+            Lightbulb, CheckCircle2, Dice5, Settings, ChevronRight, 
+            Gamepad2, Info, Trophy, Star, Zap, Layout, Monitor,
+            Smartphone, Tablet, Laptop, Watch, Tv, Speaker,
+            HardDrive, Mouse, Keyboard, Headphones,
+            Camera, Mic, Wifi, Bluetooth, Battery, Signal,
+            HelpCircle, X, ChevronLeft, Volume2, Moon, Sun,
+            Shield, Globe, Bell, Mail, Lock, Search, Menu
+        } = LucideReact;
+
+        // --- Helper Components ---
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const LucideIcon = LucideReact[name] || HelpCircle;
+            return <LucideIcon size={size} className={className} />;
+        };
+
+        // --- Game Components ---
+
+        // 1. Checkers
+        const Checkers = ({ mode: initialMode = 'ai', onHome }) => {
+            const EMPTY = 0, PLAYER = 1, OPPONENT = 2, PLAYER_KING = 3, OPPONENT_KING = 4;
+            const [board, setBoard] = useState([]);
+            const [selected, setSelected] = useState(null);
+            const [validMoves, setValidMoves] = useState([]);
+            const [playerTurn, setPlayerTurn] = useState(true);
+            const [history, setHistory] = useState([]);
+            const [status, setStatus] = useState('Ready to play!');
+
+            const initGame = useCallback(() => {
+                const newBoard = Array(8).fill(null).map(() => Array(8).fill(EMPTY));
+                for (let r = 5; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        if ((r + c) % 2 === 1) newBoard[r][c] = PLAYER;
+                    }
+                }
+                for (let r = 0; r < 3; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        if ((r + c) % 2 === 1) newBoard[r][c] = OPPONENT;
+                    }
+                }
+                setBoard(newBoard);
+                setHistory([]);
+                setPlayerTurn(true);
+                setSelected(null);
+                setValidMoves([]);
+                setStatus('Ready to play!');
+            }, []);
+
+            useEffect(() => { initGame(); }, [initGame]);
+
+            const getValidMoves = useCallback((r, c, currentBoard) => {
+                const piece = currentBoard[r][c];
+                const moves = [];
+                const isPlayer = piece === PLAYER || piece === PLAYER_KING;
+                const isKing = piece === PLAYER_KING || piece === OPPONENT_KING;
+                const dirs = isKing ? [[1, 1], [1, -1], [-1, 1], [-1, -1]] : 
+                             isPlayer ? [[-1, 1], [-1, -1]] : [[1, 1], [1, -1]];
+                
+                for (const [dr, dc] of dirs) {
+                    const nr = r + dr, nc = c + dc;
+                    if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && currentBoard[nr][nc] === EMPTY) {
+                        moves.push([nr, nc]);
+                    }
+                    const jr = r + dr * 2, jc = c + dc * 2;
+                    const mr = r + dr, mc = c + dc;
+                    if (jr >= 0 && jr < 8 && jc >= 0 && jc < 8 && currentBoard[jr][jc] === EMPTY) {
+                        const target = currentBoard[mr][mc];
+                        if (target !== EMPTY && isPlayer !== (target === PLAYER || target === PLAYER_KING)) {
+                            moves.push([jr, jc]);
+                        }
+                    }
+                }
+                return moves;
+            }, []);
+
+            const aiMove = useCallback(() => {
+                const moves = [];
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        if (board[r][c] === OPPONENT || board[r][c] === OPPONENT_KING) {
+                            const vm = getValidMoves(r, c, board);
+                            for (const m of vm) moves.push({ from: [r, c], to: m });
+                        }
+                    }
+                }
+                if (moves.length === 0) { setStatus('🎉 You Won!'); return; }
+                const jumps = moves.filter(m => Math.abs(m.to[0] - m.from[0]) === 2);
+                const move = jumps.length > 0 ? jumps[Math.floor(Math.random() * jumps.length)] : moves[Math.floor(Math.random() * moves.length)];
+                const [fr, fc] = move.from, [nr, nc] = move.to;
+                const newBoard = board.map(row => [...row]);
+                const piece = newBoard[fr][fc];
+                if (Math.abs(nr - fr) === 2) newBoard[(fr + nr) / 2][(fc + nc) / 2] = EMPTY;
+                newBoard[nr][nc] = piece;
+                newBoard[fr][fc] = EMPTY;
+                if (piece === OPPONENT && nr === 7) newBoard[nr][nc] = OPPONENT_KING;
+                setBoard(newBoard);
+                setPlayerTurn(true);
+            }, [board, getValidMoves]);
+
+            useEffect(() => {
+                if (!playerTurn && initialMode === 'ai' && !status.includes('Won')) {
+                    const timer = setTimeout(aiMove, 800);
+                    return () => clearTimeout(timer);
+                }
+            }, [playerTurn, initialMode, aiMove, status]);
+
+            const selectPiece = (r, c) => {
+                if (!playerTurn && initialMode === 'ai') return;
+                const piece = board[r][c];
+                if (piece === EMPTY || (piece === PLAYER || piece === PLAYER_KING) !== playerTurn) return;
+                setSelected([r, c]);
+                setValidMoves(getValidMoves(r, c, board));
+            };
+
+            const movePiece = (nr, nc) => {
+                if (!selected || !validMoves.some(m => m[0] === nr && m[1] === nc)) return;
+                const [fr, fc] = selected;
+                const newBoard = board.map(row => [...row]);
+                const piece = newBoard[fr][fc];
+                setHistory([...history, board.map(row => [...row])]);
+                if (Math.abs(nr - fr) === 2) newBoard[(fr + nr) / 2][(fc + nc) / 2] = EMPTY;
+                newBoard[nr][nc] = piece;
+                newBoard[fr][fc] = EMPTY;
+                if (piece === PLAYER && nr === 0) newBoard[nr][nc] = PLAYER_KING;
+                else if (piece === OPPONENT && nr === 7) newBoard[nr][nc] = OPPONENT_KING;
+                setBoard(newBoard);
+                setSelected(null);
+                setValidMoves([]);
+                setPlayerTurn(!playerTurn);
+            };
+
+            return (
+                <div className="flex flex-col items-center gap-8 py-8">
+                    <div className="flex w-full max-w-2xl justify-between gap-4">
+                        <div className={`flex-1 p-4 skeuo-card rounded-2xl transition-all ${playerTurn ? 'neon-cyan-glow scale-105' : 'opacity-40'}`}>
+                            <span className="text-[10px] font-bold uppercase text-white/40">Black</span>
+                            <div className="text-2xl font-bold">Your Turn</div>
+                        </div>
+                        <div className={`flex-1 p-4 skeuo-card rounded-2xl transition-all ${!playerTurn ? 'neon-pink-glow scale-105' : 'opacity-40'}`}>
+                            <span className="text-[10px] font-bold uppercase text-white/40">Red</span>
+                            <div className="text-2xl font-bold">AI Thinking</div>
+                        </div>
+                    </div>
+                    <div className="p-4 skeuo-card rounded-[2rem] border border-white/5">
+                        <div className="grid grid-cols-8 gap-1 bg-black/40 p-2 rounded-xl">
+                            {board.flatMap((row, r) => row.map((cell, c) => {
+                                const isDark = (r + c) % 2 === 1;
+                                const isValid = validMoves.some(m => m[0] === r && m[1] === c);
+                                const isSelected = selected && selected[0] === r && selected[1] === c;
+                                return (
+                                    <div key={`${r}-${c}`} onClick={() => isDark && (cell !== EMPTY ? selectPiece(r, c) : movePiece(r, c))}
+                                        className={`relative aspect-square w-10 sm:w-14 rounded-sm transition-all ${isDark ? 'bg-white/5' : 'bg-white/10'} ${isValid ? 'after:absolute after:h-3 after:w-3 after:rounded-full after:bg-neon-cyan/60' : ''} ${isSelected ? 'bg-neon-cyan/20 ring-1 ring-neon-cyan/50' : ''}`}>
+                                        {cell !== EMPTY && (
+                                            <motion.div layoutId={`piece-${r}-${c}`} className={`h-[85%] w-[85%] rounded-full border-2 puffy-3d m-auto flex items-center justify-center ${cell === PLAYER || cell === PLAYER_KING ? 'bg-charcoal border-white/10' : 'bg-neon-pink border-neon-pink/50'}`}>
+                                                {(cell === PLAYER_KING || cell === OPPONENT_KING) && <span className="text-xl">👑</span>}
+                                            </motion.div>
+                                        )}
+                                    </div>
+                                );
+                            }))}
+                        </div>
+                    </div>
+                    <div className="flex gap-4">
+                        <button onClick={onHome} className="skeuo-button px-6 py-3 rounded-xl font-bold flex items-center gap-2"><Home size={18}/> Home</button>
+                        <button onClick={initGame} className="skeuo-button neon-cyan-glow px-6 py-3 rounded-xl font-bold flex items-center gap-2"><RotateCcw size={18}/> Restart</button>
+                    </div>
+                </div>
+            );
+        };
+
+        // 2. Chess
+        const Chess = ({ mode: initialMode = 'ai', onHome }) => {
+            const INITIAL_BOARD = [
+                ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
+                ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'],
+                ['', '', '', '', '', '', '', ''], ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''], ['', '', '', '', '', '', '', ''],
+                ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'],
+                ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖']
+            ];
+            const [board, setBoard] = useState(INITIAL_BOARD);
+            const [selected, setSelected] = useState(null);
+            const [validMoves, setValidMoves] = useState([]);
+            const [isWhiteTurn, setIsWhiteTurn] = useState(true);
+            const [status, setStatus] = useState('White to move');
+
+            const isWhite = p => p && p.charCodeAt(0) >= 9812 && p.charCodeAt(0) <= 9817;
+            const isBlack = p => p && p.charCodeAt(0) >= 9818 && p.charCodeAt(0) <= 9823;
+
+            const getValidMoves = useCallback((r, c, b) => {
+                const piece = b[r][c]; if (!piece) return [];
+                const moves = []; const white = isWhite(piece);
+                const addMove = (nr, nc) => {
+                    if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                        const target = b[nr][nc];
+                        if (!target) { moves.push([nr, nc]); return true; }
+                        if (white !== isWhite(target)) moves.push([nr, nc]);
+                        return false;
+                    }
+                    return false;
+                };
+                // Simplified logic: King/Queen/Rook/Bishop/Knight/Pawn basic moves
+                const dirs = [[1,1],[1,-1],[-1,1],[-1,-1],[0,1],[0,-1],[1,0],[-1,0]];
+                if (piece === '♙' || piece === '♟') {
+                    const dir = white ? -1 : 1;
+                    if (r+dir >= 0 && r+dir < 8 && !b[r+dir][c]) moves.push([r+dir, c]);
+                } else {
+                    for (const [dr, dc] of dirs) {
+                        let nr = r+dr, nc = c+dc;
+                        while (addMove(nr, nc)) { if (piece === '♔' || piece === '♚' || piece === '♘' || piece === '♞') break; nr += dr; nc += dc; }
+                    }
+                }
+                return moves;
+            }, []);
+
+            const selectPiece = (r, c) => {
+                if (isWhite(board[r][c]) !== isWhiteTurn) return;
+                setSelected([r, c]);
+                setValidMoves(getValidMoves(r, c, board));
+            };
+
+            const movePiece = (nr, nc) => {
+                if (!selected || !validMoves.some(m => m[0] === nr && m[1] === nc)) return;
+                const [fr, fc] = selected;
+                const newBoard = board.map(row => [...row]);
+                newBoard[nr][nc] = newBoard[fr][fc];
+                newBoard[fr][fc] = '';
+                setBoard(newBoard);
+                setSelected(null);
+                setValidMoves([]);
+                setIsWhiteTurn(!isWhiteTurn);
+                setStatus(!isWhiteTurn ? 'White to move' : 'Black to move');
+            };
+
+            return (
+                <div className="flex flex-col items-center gap-8 py-8">
+                    <div className="p-4 skeuo-card rounded-[2rem]">
+                        <div className="grid grid-cols-8 gap-1 bg-black/40 p-2 rounded-xl">
+                            {board.flatMap((row, r) => row.map((cell, c) => {
+                                const isDark = (r + c) % 2 === 1;
+                                const isValid = validMoves.some(m => m[0] === r && m[1] === c);
+                                const isSelected = selected && selected[0] === r && selected[1] === c;
+                                return (
+                                    <div key={`${r}-${c}`} onClick={() => cell ? selectPiece(r, c) : movePiece(r, c)}
+                                        className={`aspect-square w-10 sm:w-14 flex items-center justify-center rounded-sm ${isDark ? 'bg-white/5' : 'bg-white/10'} ${isValid ? 'after:h-3 after:w-3 after:rounded-full after:bg-neon-cyan/60' : ''} ${isSelected ? 'bg-neon-cyan/20 ring-1 ring-neon-cyan/50' : ''}`}>
+                                        {cell && <div className={`text-3xl sm:text-4xl ${isWhite(cell) ? 'text-white' : 'text-neon-purple neon-purple-glow'}`}>{cell}</div>}
+                                    </div>
+                                );
+                            }))}
+                        </div>
+                    </div>
+                    <div className="flex gap-4">
+                        <button onClick={onHome} className="skeuo-button px-6 py-3 rounded-xl font-bold flex items-center gap-2"><Home size={18}/> Home</button>
+                        <button onClick={() => setBoard(INITIAL_BOARD)} className="skeuo-button neon-cyan-glow px-6 py-3 rounded-xl font-bold flex items-center gap-2"><RotateCcw size={18}/> Restart</button>
+                    </div>
+                </div>
+            );
+        };
+
+        // 3. Sudoku
+        const Sudoku = ({ onHome }) => {
+            const [grid, setGrid] = useState(Array(9).fill(null).map(() => Array(9).fill(0)));
+            const [original, setOriginal] = useState(Array(9).fill(null).map(() => Array(9).fill(0)));
+            
+            const initGame = useCallback(() => {
+                const puzzle = Array(9).fill(null).map(() => Array(9).fill(0));
+                // Fill some random numbers for demo
+                for (let i = 0; i < 20; i++) {
+                    const r = Math.floor(Math.random()*9), c = Math.floor(Math.random()*9), v = Math.floor(Math.random()*9)+1;
+                    puzzle[r][c] = v;
+                }
+                setGrid(puzzle);
+                setOriginal(JSON.parse(JSON.stringify(puzzle)));
+            }, []);
+
+            useEffect(() => { initGame(); }, [initGame]);
+
+            return (
+                <div className="flex flex-col items-center gap-8 py-8">
+                    <div className="p-4 skeuo-card rounded-[2rem]">
+                        <div className="grid grid-cols-9 gap-1 bg-black/40 p-2 rounded-xl">
+                            {grid.flatMap((row, r) => row.map((val, c) => (
+                                <div key={`${r}-${c}`} className={`aspect-square w-9 sm:w-12 flex items-center justify-center rounded-sm ${original[r][c] ? 'bg-white/5' : 'bg-white/10'}`}>
+                                    {original[r][c] ? <span className="text-xl font-bold">{val}</span> : 
+                                    <input type="text" className="w-full h-full bg-transparent text-center text-neon-cyan font-bold focus:outline-none" maxLength="1" />}
+                                </div>
+                            )))}
+                        </div>
+                    </div>
+                    <div className="flex gap-4">
+                        <button onClick={onHome} className="skeuo-button px-6 py-3 rounded-xl font-bold flex items-center gap-2"><Home size={18}/> Home</button>
+                        <button onClick={initGame} className="skeuo-button neon-cyan-glow px-6 py-3 rounded-xl font-bold flex items-center gap-2"><RotateCcw size={18}/> New Game</button>
+                    </div>
+                </div>
+            );
+        };
+
+        // 4. Snake & Ladder
+        const SnakeLadder = ({ onHome }) => {
+            const [playerPos, setPlayerPos] = useState(1);
+            const [aiPos, setAiPos] = useState(1);
+            const [playerTurn, setPlayerTurn] = useState(true);
+            const [dice, setDice] = useState(0);
+
+            const roll = () => {
+                const r = Math.floor(Math.random()*6)+1;
+                setDice(r);
+                if (playerTurn) {
+                    setPlayerPos(prev => Math.min(100, prev + r));
+                } else {
+                    setAiPos(prev => Math.min(100, prev + r));
+                }
+                setPlayerTurn(!playerTurn);
+            };
+
+            return (
+                <div className="flex flex-col items-center gap-8 py-8">
+                    <div className="flex gap-8">
+                        <div className="skeuo-card p-4 rounded-2xl text-center">
+                            <div className="text-xs text-white/40 uppercase">Player</div>
+                            <div className="text-3xl font-bold text-neon-cyan">{playerPos}</div>
+                        </div>
+                        <div className="skeuo-card p-4 rounded-2xl text-center">
+                            <div className="text-xs text-white/40 uppercase">AI</div>
+                            <div className="text-3xl font-bold text-neon-pink">{aiPos}</div>
+                        </div>
+                    </div>
+                    <div className="skeuo-card p-8 rounded-[2rem] flex flex-col items-center gap-6">
+                        <div className="text-6xl font-black text-white skeuo-card w-24 h-24 flex items-center justify-center rounded-2xl shadow-inner">{dice || '?'}</div>
+                        <button onClick={roll} className="skeuo-button neon-cyan-glow px-12 py-4 rounded-xl font-black text-xl">ROLL DICE</button>
+                    </div>
+                    <div className="flex gap-4">
+                        <button onClick={onHome} className="skeuo-button px-6 py-3 rounded-xl font-bold flex items-center gap-2"><Home size={18}/> Home</button>
+                        <button onClick={() => {setPlayerPos(1); setAiPos(1); setDice(0);}} className="skeuo-button px-6 py-3 rounded-xl font-bold flex items-center gap-2"><RotateCcw size={18}/> Restart</button>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Main App Component ---
+        const GameHub = () => {
+            const [screen, setScreen] = useState('showcase');
+            const [selectedGame, setSelectedGame] = useState(null);
+
+            const games = [
+                { id: 'checkers', name: 'Checkers', icon: 'Layout', color: 'neon-cyan', desc: 'Classic strategy board game' },
+                { id: 'chess', name: 'Chess', icon: 'Trophy', color: 'neon-purple', desc: 'The ultimate battle of minds' },
+                { id: 'sudoku', name: 'Sudoku', icon: 'Zap', color: 'neon-pink', desc: 'Logic-based number puzzle' },
+                { id: 'snakeladder', name: 'Snake & Ladder', icon: 'Dice5', color: 'neon-green', desc: 'Race to the top of the board' }
+            ];
+
+            const renderScreen = () => {
+                switch(screen) {
+                    case 'showcase':
+                        return (
+                            <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center">
+                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl">
+                                    <h1 className="text-6xl md:text-8xl font-display font-black tracking-tighter mb-6">
+                                        GAME<span className="text-neon-cyan neon-cyan-glow">HUB</span>
+                                    </h1>
+                                    <p className="text-xl text-white/60 mb-12 max-w-2xl mx-auto">
+                                        Experience a premium collection of classic games, reimagined with stunning 3D skeuomorphic design and neon aesthetics.
+                                    </p>
+                                    <div className="flex flex-wrap justify-center gap-6">
+                                        <button onClick={() => setScreen('selection')} className="skeuo-button neon-cyan-glow px-10 py-5 rounded-2xl text-xl font-bold flex items-center gap-3">
+                                            <Play fill="currentColor" /> START PLAYING
+                                        </button>
+                                        <button className="skeuo-button px-10 py-5 rounded-2xl text-xl font-bold flex items-center gap-3">
+                                            <Info /> HOW TO PLAY
+                                        </button>
+                                    </div>
+                                </motion.div>
+                                
+                                <div className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-6xl">
+                                    {games.map((g, i) => (
+                                        <motion.div key={g.id} initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
+                                            className="skeuo-card p-8 rounded-[2.5rem] flex flex-col items-center gap-4 group cursor-pointer hover:scale-105 transition-transform">
+                                            <div className={`p-6 rounded-2xl bg-white/5 text-${g.color} group-hover:${g.color}-glow transition-all`}>
+                                                <Icon name={g.icon} size={48} />
+                                            </div>
+                                            <h3 className="text-xl font-bold">{g.name}</h3>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    case 'selection':
+                        return (
+                            <div className="p-8 max-w-6xl mx-auto">
+                                <div className="flex items-center justify-between mb-12">
+                                    <button onClick={() => setScreen('showcase')} className="skeuo-button p-4 rounded-xl"><ChevronLeft /></button>
+                                    <h2 className="text-4xl font-display font-black">SELECT <span className="text-neon-cyan">GAME</span></h2>
+                                    <div className="w-12"></div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {games.map(g => (
+                                        <div key={g.id} onClick={() => { setSelectedGame(g.id); setScreen('game'); }}
+                                            className="skeuo-card p-8 rounded-[3rem] flex items-center gap-8 cursor-pointer hover:neon-cyan-glow transition-all group">
+                                            <div className={`p-8 rounded-3xl bg-white/5 text-${g.color}`}>
+                                                <Icon name={g.icon} size={64} />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-3xl font-black mb-2">{g.name}</h3>
+                                                <p className="text-white/40">{g.desc}</p>
+                                            </div>
+                                            <ChevronRight className="ml-auto text-white/20 group-hover:text-white transition-colors" size={32} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    case 'game':
+                        return (
+                            <div className="min-h-screen p-6">
+                                {selectedGame === 'checkers' && <Checkers onHome={() => setScreen('selection')} />}
+                                {selectedGame === 'chess' && <Chess onHome={() => setScreen('selection')} />}
+                                {selectedGame === 'sudoku' && <Sudoku onHome={() => setScreen('selection')} />}
+                                {selectedGame === 'snakeladder' && <SnakeLadder onHome={() => setScreen('selection')} />}
+                            </div>
+                        );
+                }
+            };
+
+            return (
+                <div className="min-h-screen">
+                    <AnimatePresence mode="wait">
+                        <motion.div key={screen} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
+                            {renderScreen()}
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<GameHub />);
+    </script>
+</body>
+</html>

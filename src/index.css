@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: "Space Grotesk", sans-serif;
+  
+  --color-charcoal: #0a0a0a;
+  --color-neon-pink: #ff00ff;
+  --color-neon-purple: #9d00ff;
+  --color-neon-cyan: #00ffff;
+  --color-neon-green: #00ff00;
+  --color-neon-amber: #ffbf00;
+}
+
+@layer base {
+  body {
+    @apply font-sans text-slate-300 antialiased min-h-screen bg-charcoal overflow-x-hidden;
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(157, 0, 255, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 80% 20%, rgba(255, 191, 0, 0.02) 0%, transparent 30%);
+  }
+}
+
+@utility skeuo-card {
+  background: linear-gradient(145deg, #1e1e1e, #0a0a0a);
+  box-shadow: 
+    12px 12px 24px #050505,
+    -6px -6px 18px rgba(255, 255, 255, 0.02),
+    inset 1px 1px 0px rgba(255, 255, 255, 0.05);
+  @apply border border-white/5;
+}
+
+@utility skeuo-button {
+  background: linear-gradient(145deg, #2a2a2a, #151515);
+  box-shadow: 
+    6px 6px 12px #050505,
+    -3px -3px 9px rgba(255, 255, 255, 0.02),
+    inset 1px 1px 0px rgba(255, 255, 255, 0.1);
+  @apply border border-white/5 transition-all duration-200 active:scale-95 cursor-pointer;
+
+  &:active {
+    background: linear-gradient(145deg, #151515, #2a2a2a);
+    box-shadow: 
+      inset 6px 6px 12px #050505,
+      inset -3px -3px 9px rgba(255, 255, 255, 0.02);
+  }
+}
+
+@utility neon-pink-glow {
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.4), inset 0 0 8px rgba(255, 0, 255, 0.2);
+  @apply border-neon-pink/50 text-neon-pink;
+  text-shadow: 0 0 12px rgba(255, 0, 255, 0.6);
+}
+
+@utility neon-cyan-glow {
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.4), inset 0 0 8px rgba(0, 255, 255, 0.2);
+  @apply border-neon-cyan/50 text-neon-cyan;
+  text-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+}
+
+@utility neon-purple-glow {
+  box-shadow: 0 0 20px rgba(157, 0, 255, 0.4), inset 0 0 8px rgba(157, 0, 255, 0.2);
+  @apply border-neon-purple/50 text-neon-purple;
+  text-shadow: 0 0 12px rgba(157, 0, 255, 0.6);
+}
+
+@utility neon-green-glow {
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.4), inset 0 0 8px rgba(0, 255, 0, 0.2);
+  @apply border-neon-green/50 text-neon-green;
+  text-shadow: 0 0 12px rgba(0, 255, 0, 0.6);
+}
+
+@utility neon-amber-glow {
+  box-shadow: 0 0 20px rgba(255, 191, 0, 0.4), inset 0 0 8px rgba(255, 191, 0, 0.2);
+  @apply border-neon-amber/50 text-neon-amber;
+  text-shadow: 0 0 12px rgba(255, 191, 0, 0.6);
+}
+
+@utility puffy-3d {
+  @apply rounded-3xl;
+  box-shadow: 
+    inset 0 10px 20px rgba(255, 255, 255, 0.1),
+    inset 0 -10px 20px rgba(0, 0, 0, 0.5),
+    0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+@utility mobile-frame {
+  @apply w-full h-full rounded-none border-none relative overflow-hidden;
+  background: #121212;
+  
+  @screen sm {
+    @apply w-[320px] h-[640px] rounded-[3rem] border border-white/10;
+    box-shadow: 
+      0 50px 100px -20px rgba(0, 0, 0, 0.5),
+      0 30px 60px -30px rgba(0, 0, 0, 0.6),
+      inset 0 -2px 6px rgba(255, 255, 255, 0.05);
+  }
+}
+
+@utility showcase-frame {
+  @apply w-[220px] h-[440px] sm:w-[260px] sm:h-[520px] lg:w-[280px] lg:h-[580px] rounded-[2.5rem] relative overflow-hidden border border-white/10;
+  background: #121212;
+  box-shadow: 
+    0 30px 60px -15px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 3px rgba(255, 255, 255, 0.05);
+}
+@utility light-trail {
+  @apply absolute h-[1px] bg-gradient-to-r from-transparent via-neon-cyan/20 to-transparent;
+  width: 200%;
+  animation: trail 8s linear infinite;
+}
+
+@keyframes trail {
+  0% { transform: translateX(-100%) rotate(-45deg); }
+  100% { transform: translateX(100%) rotate(-45deg); }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -15;
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
